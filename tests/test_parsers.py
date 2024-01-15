@@ -33,7 +33,43 @@ def test_FastaParser():
     files that are blank or corrupted in some way. Two example Fasta files are
     provided in /tests/bad.fa and /tests/empty.fa
     """
-    pass
+    
+    # Check bad seq files. First is bad.fa
+    with pytest.raises(ValueError):
+        bad_fa = FastaParser('bad.fa')
+        seq_inter = iter(bad_fa)
+        next(seq_inter)
+    
+
+    # Check bad seq files. Second is blank.fa
+    with pytest.raises(ValueError):
+        blank_fa = FastaParser('blank.fa')
+        seq_inter = iter(blank_fa)
+        next(seq_inter)
+    
+
+    # check good_single.fa
+    single_seq = FastaParser('good_single.fa')
+    seq_inter = iter(single_seq)
+    name, seq = next(seq_inter)
+    
+    assert name == 'seq1'
+    assert seq == 'ACGGACCACCATGAA'
+
+    
+    # check good_two.fa
+    two_seq = FastaParser('good_two.fa')
+    seq_inter = iter(two_seq)
+    name, seq = next(seq_inter)
+    
+    assert name == 'seq1'
+    assert seq == 'ACGGACCACCATGAA'
+
+    name, seq = next(seq_inter)
+    
+    assert name == 'seq2'
+    assert seq == 'ACGGACCTGAA'
+
 
 
 def test_FastaFormat():
