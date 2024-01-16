@@ -2,7 +2,9 @@
 
 from seqparser import (
         FastaParser,
-        FastqParser)
+        FastqParser,
+        transcribe,
+        reverse_transcribe)
 
 import pytest
 
@@ -143,3 +145,79 @@ def test_FastqFormat():
     seq_inter = iter(single_seq)
     name, seq, qual = next(seq_inter)
     assert name is None
+
+
+def test_Transcription():
+    """
+    Test transcription function.
+    """
+    # Blank case
+    seq = ''
+    correct_ans = ''
+    transcribed = transcribe(seq)
+    assert transcribed == correct_ans
+
+
+    # Bad seq case
+    with pytest.raises(KeyError):
+        seq = 'Foo'
+        transcribed = transcribe(seq)
+
+    # Single base case not T
+    seq = 'G'
+    correct_ans = 'C'
+    transcribed = transcribe(seq)
+    assert transcribed == correct_ans
+        
+    # Single base case T
+    seq = 'A'
+    correct_ans = 'U'
+    transcribed = transcribe(seq)
+    assert transcribed == correct_ans
+
+    # Regular case
+    seq = 'ACTGAACCC'
+    correct_ans = 'UGACUUGGG'
+    transcribed = transcribe(seq)
+    assert transcribed == correct_ans
+
+
+def test_Reverse_Transcription():
+    '''
+    Test reverse transcription
+    '''
+    # Blank case
+    seq = ''
+    correct_ans = ''
+    transcribed = reverse_transcribe(seq)
+    assert transcribed == correct_ans
+
+
+    # Bad seq case
+    with pytest.raises(KeyError):
+        seq = 'Foo'
+        transcribed = reverse_transcribe(seq)
+
+    # Single base case not T
+    seq = 'G'
+    correct_ans = 'C'
+    transcribed = reverse_transcribe(seq)
+    assert transcribed == correct_ans
+        
+    # Single base case T
+    seq = 'A'
+    correct_ans = 'U'
+    transcribed = reverse_transcribe(seq)
+    assert transcribed == correct_ans
+
+    # Regular case
+    seq = 'ACTGAACCC'
+    correct_ans = 'GGGUUCAGU'
+    transcribed = reverse_transcribe(seq)
+    assert transcribed == correct_ans
+
+    # Symmetric case
+    seq = 'CCCCCCC'
+    correct_ans = 'GGGGGGG'
+    transcribed = reverse_transcribe(seq)
+    assert transcribed == correct_ans
