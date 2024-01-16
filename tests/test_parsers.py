@@ -77,7 +77,18 @@ def test_FastaFormat():
     Test to make sure that a fasta file is being read in if a fastq file is
     read, the first item is None
     """
-    pass
+    
+    # Test a good .fa file
+    single_seq = FastaParser('good_single.fa')
+    seq_inter = iter(single_seq)
+    name, seq = next(seq_inter)
+    assert name is not None
+
+    # Test reading a fastq file. First item should be None
+    single_seq = FastaParser('../data/test.fq')
+    seq_inter = iter(single_seq)
+    name, seq = next(seq_inter)
+    assert name is None
 
 
 def test_FastqParser():
