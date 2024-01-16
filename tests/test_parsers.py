@@ -97,11 +97,49 @@ def test_FastqParser():
     an instance of your FastqParser class and assert that it properly reads 
     in the example Fastq File.
     """
-    pass
+    
+    # check good fastaq, ../data/test.fq
+    single_seq = FastqParser('../data/test.fq')
+    seq_inter = iter(single_seq)
+    name, seq, qual = next(seq_inter)
+
+    assert name == 'seq0'
+    assert seq == 'TGTGGTCGTATAGTTATTGTCATAAATTACACAGAATCGCGATTCTCCGCGTCCACCAATCTTAGTGCACCACAGCATCGACCCGATTTATGACGCTGAG'
+    assert qual == """*540($=*,=.062565,2>'487')!:&&6=,6,*7>:&132&83*8(58&59>'8!;28<94,0*;*.94**:9+7"94(>7='(!5"2/!%"4#32="""
+
+    name, seq, qual = next(seq_inter)
+
+    assert name == 'seq1'
+    assert seq == 'CCCCGGACGACTGATCCCGATAGAGCTCACTCTTCGAGGCAAGCAGACCCATATCGTCCTGCTGGCAACGCTATCCGGGTGCGAGTAAATCGAAACCTCG'
+    assert qual == """'(<#/0$5&!$+,:=%7=50--1;'(-7;0>=$(05*9,,:%0!<),%646<8#%"."-'*-0:.+*&$5!'8)(%3*+9/&/%=363*,6$20($97,\""""
+
+    # Check bad seq files. Second is blank.fq
+    with pytest.raises(ValueError):
+        blank_fq = FastqParser('blank.fq')
+        seq_inter = iter(blank_fq)
+        next(seq_inter)
+
+    # Check bad seq files. First is bad.fq
+    # (Unmodified parser seems to fail this...)
+    with pytest.raises(ValueError):
+        bad_fq = FastqParser('bad.fq')
+        seq_inter = iter(bad_fq)
+        print(next(seq_inter))
+
 
 def test_FastqFormat():
     """
     Test to make sure fastq file is being read in. If this is a fasta file, the
     first line is None
     """
-    pass
+    # Testing a good fastq file 
+    single_seq = FastqParser('../data/test.fq')
+    seq_inter = iter(single_seq)
+    name, seq, qual = next(seq_inter)
+    assert name is not None
+
+    # Test a .fa file. first line should be None
+    single_seq = FastqParser('good_single.fa')
+    seq_inter = iter(single_seq)
+    name, seq, qual = next(seq_inter)
+    assert name is None
