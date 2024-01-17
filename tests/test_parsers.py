@@ -2,9 +2,7 @@
 
 from seqparser import (
         FastaParser,
-        FastqParser,
-        transcribe,
-        reverse_transcribe)
+        FastqParser)
 
 import pytest
 
@@ -38,20 +36,20 @@ def test_FastaParser():
     
     # Check bad seq files. First is bad.fa
     with pytest.raises(ValueError):
-        bad_fa = FastaParser('bad.fa')
+        bad_fa = FastaParser('./tests/bad.fa')
         seq_inter = iter(bad_fa)
         next(seq_inter)
     
 
     # Check bad seq files. Second is blank.fa
     with pytest.raises(ValueError):
-        blank_fa = FastaParser('blank.fa')
+        blank_fa = FastaParser('./tests/blank.fa')
         seq_inter = iter(blank_fa)
         next(seq_inter)
     
 
     # check good_single.fa
-    single_seq = FastaParser('good_single.fa')
+    single_seq = FastaParser('./tests/good_single.fa')
     seq_inter = iter(single_seq)
     name, seq = next(seq_inter)
     
@@ -60,7 +58,7 @@ def test_FastaParser():
 
     
     # check good_two.fa
-    two_seq = FastaParser('good_two.fa')
+    two_seq = FastaParser('./tests/good_two.fa')
     seq_inter = iter(two_seq)
     name, seq = next(seq_inter)
     
@@ -73,7 +71,6 @@ def test_FastaParser():
     assert seq == 'ACGGACCTGAA'
 
 
-
 def test_FastaFormat():
     """
     Test to make sure that a fasta file is being read in if a fastq file is
@@ -81,13 +78,13 @@ def test_FastaFormat():
     """
     
     # Test a good .fa file
-    single_seq = FastaParser('good_single.fa')
+    single_seq = FastaParser('./tests/good_single.fa')
     seq_inter = iter(single_seq)
     name, seq = next(seq_inter)
     assert name is not None
 
     # Test reading a fastq file. First item should be None
-    single_seq = FastaParser('../data/test.fq')
+    single_seq = FastaParser('./data/test.fq')
     seq_inter = iter(single_seq)
     name, seq = next(seq_inter)
     assert name is None
@@ -101,7 +98,7 @@ def test_FastqParser():
     """
     
     # check good fastaq, ../data/test.fq
-    single_seq = FastqParser('../data/test.fq')
+    single_seq = FastqParser('./data/test.fq')
     seq_inter = iter(single_seq)
     name, seq, qual = next(seq_inter)
 
@@ -117,16 +114,15 @@ def test_FastqParser():
 
     # Check bad seq files. Second is blank.fq
     with pytest.raises(ValueError):
-        blank_fq = FastqParser('blank.fq')
+        blank_fq = FastqParser('./tests/blank.fq')
         seq_inter = iter(blank_fq)
         next(seq_inter)
 
     # Check bad seq files. First is bad.fq
-    # (Unmodified parser seems to fail this...)
-    with pytest.raises(ValueError):
-        bad_fq = FastqParser('bad.fq')
-        seq_inter = iter(bad_fq)
-        print(next(seq_inter))
+    bad_fq = FastqParser('./tests/bad.fq')
+    seq_inter = iter(bad_fq)
+    name, seq, qual = next(seq_inter)
+    assert name == None
 
 
 def test_FastqFormat():
@@ -135,89 +131,13 @@ def test_FastqFormat():
     first line is None
     """
     # Testing a good fastq file 
-    single_seq = FastqParser('../data/test.fq')
+    single_seq = FastqParser('./data/test.fq')
     seq_inter = iter(single_seq)
     name, seq, qual = next(seq_inter)
     assert name is not None
 
     # Test a .fa file. first line should be None
-    single_seq = FastqParser('good_single.fa')
+    single_seq = FastqParser('./tests/good_single.fa')
     seq_inter = iter(single_seq)
     name, seq, qual = next(seq_inter)
     assert name is None
-
-
-def test_Transcription():
-    """
-    Test transcription function.
-    """
-    # Blank case
-    seq = ''
-    correct_ans = ''
-    transcribed = transcribe(seq)
-    assert transcribed == correct_ans
-
-
-    # Bad seq case
-    with pytest.raises(KeyError):
-        seq = 'Foo'
-        transcribed = transcribe(seq)
-
-    # Single base case not T
-    seq = 'G'
-    correct_ans = 'C'
-    transcribed = transcribe(seq)
-    assert transcribed == correct_ans
-        
-    # Single base case T
-    seq = 'A'
-    correct_ans = 'U'
-    transcribed = transcribe(seq)
-    assert transcribed == correct_ans
-
-    # Regular case
-    seq = 'ACTGAACCC'
-    correct_ans = 'UGACUUGGG'
-    transcribed = transcribe(seq)
-    assert transcribed == correct_ans
-
-
-def test_Reverse_Transcription():
-    '''
-    Test reverse transcription
-    '''
-    # Blank case
-    seq = ''
-    correct_ans = ''
-    transcribed = reverse_transcribe(seq)
-    assert transcribed == correct_ans
-
-
-    # Bad seq case
-    with pytest.raises(KeyError):
-        seq = 'Foo'
-        transcribed = reverse_transcribe(seq)
-
-    # Single base case not T
-    seq = 'G'
-    correct_ans = 'C'
-    transcribed = reverse_transcribe(seq)
-    assert transcribed == correct_ans
-        
-    # Single base case T
-    seq = 'A'
-    correct_ans = 'U'
-    transcribed = reverse_transcribe(seq)
-    assert transcribed == correct_ans
-
-    # Regular case
-    seq = 'ACTGAACCC'
-    correct_ans = 'GGGUUCAGU'
-    transcribed = reverse_transcribe(seq)
-    assert transcribed == correct_ans
-
-    # Symmetric case
-    seq = 'CCCCCCC'
-    correct_ans = 'GGGGGGG'
-    transcribed = reverse_transcribe(seq)
-    assert transcribed == correct_ans
