@@ -141,3 +141,6 @@ def test_FastqFormat():
     seq_inter = iter(single_seq)
     name, seq, qual = next(seq_inter)
     assert name is None
+
+def test_should_fail():
+    assert 1 == 2
